@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { DEFAULT_EDITOR_PROFILE } from '../data/seedPortfolios'
 import { PORTFOLIO_TEMPLATES } from '../data/templates'
-import { pullSocialDataWithAI } from '../lib/socialImport'
+import { autoDesignLandingPage, pullSocialDataWithAI } from '../lib/socialImport'
 import {
   getProfileBySlug,
   normalizePortfolioSlug,
@@ -19,6 +19,7 @@ const PANELS: { id: EditorPanel; label: string }[] = [
   { id: 'services', label: 'Services' },
   { id: 'portfolio', label: 'Portfolio' },
   { id: 'testimonials', label: 'Testimonials' },
+  { id: 'api', label: 'API Connect' },
   { id: 'social', label: 'Social + AI' },
   { id: 'sharing', label: 'Slug + QR' },
 ]
@@ -49,8 +50,9 @@ export function EditorPage() {
 
   const [activePanel, setActivePanel] = useState<EditorPanel>('basics')
   const [profile, setProfile] = useState<PortfolioData>(DEFAULT_EDITOR_PROFILE)
-  const [status, setStatus] = useState('Start editing your portfolio profile.')
+  const [status, setStatus] = useState('Flowboard ready. Start shaping your portfolio board.')
   const [busyPlatform, setBusyPlatform] = useState<'instagram' | 'linkedin' | 'x' | ''>('')
+  const [isAutoDesigning, setIsAutoDesigning] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState('')
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export function EditorPage() {
       updatedAt: new Date().toISOString(),
     })
     setProfile(saved)
-    setStatus(`Published! Portfolio available at ${window.location.origin}/p/${saved.slug}`)
+    setStatus(`Published on Flowboard! Portfolio available at ${window.location.origin}/p/${saved.slug}`)
   }
 
   const runSocialImport = async (platform: 'instagram' | 'linkedin' | 'x') => {
@@ -116,13 +118,29 @@ export function EditorPage() {
     }
   }
 
+  const runAutoDesign = async () => {
+    setIsAutoDesigning(true)
+    setStatus('Flowboard AI is building your landing page style from connected social data...')
+
+    try {
+      const updates = await autoDesignLandingPage({ current: profile })
+      setProfile((current) => ({ ...current, ...updates }))
+      setStatus('Flowboard AI generated a compelling layout direction. Review and publish when ready.')
+      setActivePanel('sharing')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to run AI auto-design.')
+    } finally {
+      setIsAutoDesigning(false)
+    }
+  }
+
   return (
     <main className="studio">
       <section className="studio__editor">
         <header className="studio__header">
-          <h1>Portfolio Studio Editor</h1>
+          <h1>Flowboard Editor</h1>
           <p>
-            Navigate sections, switch templates, connect social profiles, and publish to your own slug.
+            Build your portfolio board with editorial templates, connected APIs, and AI-assisted page automation.
           </p>
           <p className="studio__status">{status}</p>
         </header>
@@ -366,6 +384,113 @@ export function EditorPage() {
           </section>
         )}
 
+        {activePanel === 'api' && (
+          <section className="studio__panel">
+            <h2>Flowboard API Connect</h2>
+            <p>
+              Connect social/API credentials so AI can pull profile context and automate your landing page design.
+            </p>
+            <label>
+              Instagram API Token
+              <input
+                value={profile.apiConnections.instagramToken}
+                onChange={(event) =>
+                  updateProfile({
+                    apiConnections: {
+                      ...profile.apiConnections,
+                      instagramToken: event.target.value,
+                    },
+                  })
+                }
+                placeholder="ig-token-..."
+              />
+            </label>
+            <label>
+              LinkedIn API Token
+              <input
+                value={profile.apiConnections.linkedinToken}
+                onChange={(event) =>
+                  updateProfile({
+                    apiConnections: {
+                      ...profile.apiConnections,
+                      linkedinToken: event.target.value,
+                    },
+                  })
+                }
+                placeholder="linkedin-token-..."
+              />
+            </label>
+            <label>
+              X API Token
+              <input
+                value={profile.apiConnections.xToken}
+                onChange={(event) =>
+                  updateProfile({
+                    apiConnections: {
+                      ...profile.apiConnections,
+                      xToken: event.target.value,
+                    },
+                  })
+                }
+                placeholder="x-token-..."
+              />
+            </label>
+            <label>
+              AI Provider
+              <select
+                value={profile.apiConnections.aiProvider}
+                onChange={(event) =>
+                  updateProfile({
+                    apiConnections: {
+                      ...profile.apiConnections,
+                      aiProvider: event.target.value as PortfolioData['apiConnections']['aiProvider'],
+                    },
+                  })
+                }
+              >
+                <option>OpenAI</option>
+                <option>Anthropic</option>
+                <option>Custom</option>
+              </select>
+            </label>
+            <label>
+              AI Model
+              <input
+                value={profile.apiConnections.aiModel}
+                onChange={(event) =>
+                  updateProfile({
+                    apiConnections: {
+                      ...profile.apiConnections,
+                      aiModel: event.target.value,
+                    },
+                  })
+                }
+                placeholder="gpt-4.1-mini / claude-3.7-sonnet / custom"
+              />
+            </label>
+            {profile.apiConnections.aiProvider === 'Custom' && (
+              <label>
+                Custom AI Endpoint
+                <input
+                  value={profile.apiConnections.customEndpoint}
+                  onChange={(event) =>
+                    updateProfile({
+                      apiConnections: {
+                        ...profile.apiConnections,
+                        customEndpoint: event.target.value,
+                      },
+                    })
+                  }
+                  placeholder="https://your-ai-endpoint.example.com/generate"
+                />
+              </label>
+            )}
+            <p className="studio__hint">
+              Demo note: these credentials stay in local browser storage in this prototype.
+            </p>
+          </section>
+        )}
+
         {activePanel === 'social' && (
           <section className="studio__panel">
             <h2>Social Connect + AI Populate</h2>
@@ -386,7 +511,7 @@ export function EditorPage() {
                 </label>
                 <button
                   type="button"
-                  disabled={busyPlatform.length > 0}
+                  disabled={busyPlatform.length > 0 || isAutoDesigning}
                   onClick={() => {
                     void runSocialImport(platform)
                   }}
@@ -428,6 +553,9 @@ export function EditorPage() {
                 }
               />
             </label>
+            <button type="button" disabled={isAutoDesigning || busyPlatform.length > 0} onClick={() => void runAutoDesign()}>
+              {isAutoDesigning ? 'Auto-designing...' : 'Auto-Design Landing Page with AI'}
+            </button>
           </section>
         )}
 
@@ -444,6 +572,9 @@ export function EditorPage() {
                 >
                   <strong>{template.name}</strong>
                   <span>{template.description}</span>
+                  <span className="studio__template-meta">
+                    {template.trendNote} · {template.motion} motion · {template.graphics} graphics
+                  </span>
                 </button>
               ))}
             </div>

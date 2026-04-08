@@ -27,7 +27,7 @@ export function PortfolioRenderer({
 
   return (
     <article
-      className={`portfolio portfolio--${template.layout}`}
+      className={`portfolio portfolio--${template.layout} portfolio--motion-${template.motion} portfolio--graphic-${template.graphics}`}
       style={
         {
           '--page-bg': template.theme.pageBg,
@@ -43,6 +43,10 @@ export function PortfolioRenderer({
       <header className="portfolio__hero">
         <img className="portfolio__hero-image" src={profile.heroImageUrl} alt={`${profile.displayName} banner`} />
         <div className="portfolio__hero-overlay" />
+        <div className="portfolio__hero-graphics" aria-hidden="true">
+          <span />
+          <span />
+        </div>
         <div className="portfolio__hero-content">
           <img className="portfolio__avatar" src={profile.avatarUrl} alt={profile.displayName} />
           <div>
@@ -50,6 +54,7 @@ export function PortfolioRenderer({
             <h1>{profile.displayName}</h1>
             <p className="portfolio__role">{profile.role}</p>
             <p className="portfolio__tagline">{profile.tagline}</p>
+            <p className="portfolio__trend">{template.trendNote}</p>
           </div>
         </div>
       </header>

@@ -1,14 +1,34 @@
-# Portfolio Studio (Webflow-style templates + editor)
+# Flowboard
 
-This project is a React + TypeScript app that provides:
+Flowboard is an AI-assisted portfolio board builder for creators, public people, and brands.
 
-- 8 ready portfolio pages (singer, actor, public figure, company, influencer, startup, agency)
-- A navigable live editor with changeable sections
-- Template switching connected to live preview
-- Social connect buttons (Instagram, LinkedIn, X + extras)
-- AI-powered social pull simulation to auto-populate portfolio fields
-- Custom slug publishing (`/p/your-slug` and `/your-slug`)
-- QR code generation for shareable digital name cards
+## Core idea
+
+Users can:
+
+- pick from 8 portfolio templates
+- customize every section in a navigable editor
+- connect social APIs (Instagram, LinkedIn, X)
+- let AI pull and transform social profile context
+- auto-generate a compelling landing page direction
+- publish to custom slugs (`/p/your-slug` or `/your-slug`)
+- share via downloadable QR code (name-card style)
+
+## Design system direction (trend research applied)
+
+Flowboard templates are tuned around current landing/portfolio patterns:
+
+- editorial typography with oversized hero messaging
+- bento-style modular sections for scannable content
+- restrained motion (micro-interactions + subtle hero animation)
+- accent gradients and glass-like layering used selectively
+
+Each template includes:
+
+- distinct font family
+- distinct color palette
+- motion preset (`float`, `pulse`, `pan`)
+- graphics preset (`mesh`, `rings`, `grain`, `minimal`)
 
 ## Run locally
 
@@ -19,22 +39,29 @@ npm run dev
 
 Open:
 
-- Template gallery: `http://localhost:5173/`
+- Gallery: `http://localhost:5173/`
 - Editor: `http://localhost:5173/editor`
-- Public profile example: `http://localhost:5173/p/aria-velvet`
+- Sample page: `http://localhost:5173/p/aria-velvet`
 
 ## Build
 
 ```bash
+npm run lint
 npm run build
 npm run preview
 ```
 
-## How it works
+## Project structure
 
-- Seed templates and pages are in `src/data/`
-- Editor and portfolio renderer are in `src/components/`
-- Social AI import logic is in `src/lib/socialImport.ts`
-- Slug/local storage publishing logic is in `src/lib/storage.ts`
+- `src/data/` templates + sample pages
+- `src/components/` editor, home, renderer, public page
+- `src/lib/socialImport.ts` social/API pull + auto-design logic
+- `src/lib/storage.ts` local persistence + slug resolution
 
-Saved pages are stored in browser localStorage so each user can publish custom slugs instantly.
+## Deployment
+
+`vercel.json` includes SPA rewrites so dynamic routes work on Vercel:
+
+- `/editor`
+- `/p/:slug`
+- `/:slug`

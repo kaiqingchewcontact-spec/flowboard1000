@@ -10,13 +10,13 @@ export function PublicPortfolioPage() {
   if (!profile) {
     return (
       <main className="missing">
-        <h1>Portfolio not found</h1>
+        <h1>Flowboard page not found</h1>
         <p>
           The slug <strong>/{slug}</strong> does not exist yet.
         </p>
         <div className="missing__actions">
-          <Link to="/">See template gallery</Link>
-          <Link to="/editor">Create this page in editor</Link>
+          <Link to="/">See Flowboard gallery</Link>
+          <Link to="/editor">Create this page in Flowboard</Link>
         </div>
       </main>
     )
@@ -25,8 +25,8 @@ export function PublicPortfolioPage() {
   return (
     <main className="public-page">
       <div className="public-page__actions">
-        <Link to="/">Template Gallery</Link>
-        <Link to={`/editor?slug=${profile.slug}`}>Edit this Portfolio</Link>
+        <Link to="/">Flowboard Gallery</Link>
+        <Link to={`/editor?slug=${profile.slug}`}>Edit this page</Link>
       </div>
       <PortfolioRenderer profile={profile} shareUrl={url} />
     </main>

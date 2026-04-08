@@ -1,3 +1,4 @@
+import { PORTFOLIO_TEMPLATES } from '../data/templates'
 import type { PortfolioData } from '../types'
 
 type SocialPlatform = 'instagram' | 'linkedin' | 'x'
@@ -5,6 +6,10 @@ type SocialPlatform = 'instagram' | 'linkedin' | 'x'
 interface SocialPullInput {
   platform: SocialPlatform
   source: string
+  current: PortfolioData
+}
+
+interface LandingAutoDesignInput {
   current: PortfolioData
 }
 
@@ -28,6 +33,16 @@ export const pullSocialDataWithAI = async ({
   source,
   current,
 }: SocialPullInput): Promise<Partial<PortfolioData>> => {
+  const tokenByPlatform: Record<SocialPlatform, string> = {
+    instagram: current.apiConnections.instagramToken,
+    linkedin: current.apiConnections.linkedinToken,
+    x: current.apiConnections.xToken,
+  }
+
+  if (!tokenByPlatform[platform].trim()) {
+    throw new Error(`Connect your ${platform === 'x' ? 'X' : platform} API token in API Connect first.`)
+  }
+
   const handle = toHandle(source)
   if (!handle) {
     throw new Error('Please enter a username or profile URL first.')
@@ -80,7 +95,7 @@ export const pullSocialDataWithAI = async ({
       new Set([
         ...current.highlights,
         `${platform === 'x' ? 'X' : platform} handle: @${handle}`,
-        'AI-enriched social profile',
+        `AI-enriched social profile (${current.apiConnections.aiProvider} · ${current.apiConnections.aiModel})`,
       ]),
     ).slice(0, 5),
     social: {
@@ -88,5 +103,68 @@ export const pullSocialDataWithAI = async ({
       [platform]: socialLink,
     },
     avatarUrl: `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(handle)}`,
+  }
+}
+
+const templateByCategory = (category: PortfolioData['category']) => {
+  const categoryTemplate = PORTFOLIO_TEMPLATES.find((template) => template.category === category)
+  return categoryTemplate ?? PORTFOLIO_TEMPLATES[0]
+}
+
+export const autoDesignLandingPage = async ({
+  current,
+}: LandingAutoDesignInput): Promise<Partial<PortfolioData>> => {
+  const tokenByPlatform: Record<SocialPlatform, string> = {
+    instagram: current.apiConnections.instagramToken,
+    linkedin: current.apiConnections.linkedinToken,
+    x: current.apiConnections.xToken,
+  }
+
+  const connectedPlatforms = (['instagram', 'linkedin', 'x'] as const).filter(
+    (platform) => tokenByPlatform[platform].trim().length > 0,
+  )
+
+  if (current.apiConnections.aiProvider === 'Custom' && !current.apiConnections.customEndpoint.trim()) {
+    throw new Error('Custom AI provider selected. Please add a custom AI endpoint first.')
+  }
+
+  if (connectedPlatforms.length === 0) {
+    throw new Error('Connect at least one social API token before running AI auto-design.')
+  }
+
+  await wait(900)
+
+  const selectedTemplate = templateByCategory(current.category)
+  const socialProof = connectedPlatforms
+    .map((platform) => `${platform === 'x' ? 'X' : platform} connected`)
+    .join(' · ')
+
+  const maybeWebsite =
+    current.social.website.trim() || `https://flowboard.site/${current.slug || current.displayName.toLowerCase()}`
+
+  return {
+    templateId: selectedTemplate.id,
+    tagline: `${current.displayName} on Flowboard — ${selectedTemplate.trendNote.toLowerCase()}.`,
+    bio: `${current.bio}\n\nDesigned by AI from your connected social graph (${socialProof}).`,
+    highlights: Array.from(
+      new Set([
+        ...current.highlights,
+        `Auto-designed with ${current.apiConnections.aiProvider}`,
+        selectedTemplate.trendNote,
+        `Landing style: ${selectedTemplate.name}`,
+      ]),
+    ).slice(0, 6),
+    services: Array.from(
+      new Set([
+        ...current.services,
+        'Brand-safe landing page automation',
+        'Social profile to portfolio sync',
+        'AI narrative and design enhancement',
+      ]),
+    ).slice(0, 6),
+    social: {
+      ...current.social,
+      website: maybeWebsite,
+    },
   }
 }

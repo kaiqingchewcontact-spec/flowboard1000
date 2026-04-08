@@ -2,7 +2,17 @@ import { SEED_PORTFOLIOS, VALID_TEMPLATE_IDS } from '../data/seedPortfolios'
 import { PORTFOLIO_TEMPLATES } from '../data/templates'
 import type { PortfolioData } from '../types'
 
-const STORAGE_KEY = 'portfolio-studio-profiles-v1'
+const STORAGE_KEY = 'flowboard-profiles-v2'
+const LEGACY_STORAGE_KEY = 'portfolio-studio-profiles-v1'
+
+const DEFAULT_API_CONNECTIONS: PortfolioData['apiConnections'] = {
+  instagramToken: '',
+  linkedinToken: '',
+  xToken: '',
+  aiProvider: 'OpenAI',
+  aiModel: 'gpt-4.1-mini',
+  customEndpoint: '',
+}
 
 const normalizeSlug = (slug: string) =>
   slug
@@ -21,6 +31,7 @@ const sanitizeProfile = (profile: PortfolioData): PortfolioData => {
     ...profile,
     slug: normalizeSlug(profile.slug) || 'my-portfolio',
     templateId,
+    apiConnections: profile.apiConnections ?? DEFAULT_API_CONNECTIONS,
     updatedAt: profile.updatedAt || new Date().toISOString(),
   }
 }
@@ -29,7 +40,7 @@ export const getSavedProfiles = (): PortfolioData[] => {
   if (typeof window === 'undefined') return []
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw) as PortfolioData[]
     if (!Array.isArray(parsed)) return []

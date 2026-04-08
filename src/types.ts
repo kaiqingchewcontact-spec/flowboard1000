@@ -30,6 +30,15 @@ export interface SocialLinks {
   website: string
 }
 
+export interface ApiConnections {
+  instagramToken: string
+  linkedinToken: string
+  xToken: string
+  aiProvider: 'OpenAI' | 'Anthropic' | 'Custom'
+  aiModel: string
+  customEndpoint: string
+}
+
 export interface PortfolioData {
   id: string
   slug: string
@@ -47,6 +56,7 @@ export interface PortfolioData {
   portfolioItems: PortfolioItem[]
   testimonials: Testimonial[]
   social: SocialLinks
+  apiConnections: ApiConnections
   contactEmail: string
   contactPhone: string
   updatedAt: string
@@ -66,8 +76,11 @@ export interface PortfolioTemplate {
   id: string
   name: string
   description: string
+  trendNote: string
   category: TemplateCategory
   layout: 'spotlight' | 'split' | 'story' | 'grid'
+  motion: 'float' | 'pulse' | 'pan'
+  graphics: 'mesh' | 'rings' | 'grain' | 'minimal'
   theme: TemplateTheme
 }
 
@@ -77,5 +90,6 @@ export type EditorPanel =
   | 'services'
   | 'portfolio'
   | 'testimonials'
+  | 'api'
   | 'social'
   | 'sharing'
