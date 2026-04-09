@@ -75,6 +75,84 @@ const makeProfile = (
   updatedAt: now,
 })
 
+const makeLoremProfile = (
+  slug: string,
+  templateId: string,
+  displayName: string,
+  category: TemplateCategory,
+  role: string,
+): PortfolioData => ({
+  id: `seed-${slug}`,
+  slug,
+  templateId,
+  category,
+  displayName,
+  role,
+  tagline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+  location: 'Lorem City',
+  avatarUrl: `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(displayName)}`,
+  heroImageUrl: `https://picsum.photos/seed/${encodeURIComponent(slug)}/1200/600`,
+  highlights: [
+    'Lorem ipsum dolor sit amet',
+    'Consectetur adipiscing elit',
+    'Sed do eiusmod tempor incididunt',
+  ],
+  services: [
+    'Lorem ipsum service one',
+    'Lorem ipsum service two',
+    'Lorem ipsum service three',
+  ],
+  portfolioItems: [
+    {
+      title: 'Lorem Ipsum Project I',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      link: 'https://example.com',
+      imageUrl: `https://picsum.photos/seed/${encodeURIComponent(`${slug}-lorem-1`)}/800/500`,
+    },
+    {
+      title: 'Lorem Ipsum Project II',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      link: 'https://example.com',
+      imageUrl: `https://picsum.photos/seed/${encodeURIComponent(`${slug}-lorem-2`)}/800/500`,
+    },
+    {
+      title: 'Lorem Ipsum Project III',
+      description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+      link: 'https://example.com',
+      imageUrl: `https://picsum.photos/seed/${encodeURIComponent(`${slug}-lorem-3`)}/800/500`,
+    },
+  ],
+  testimonials: [
+    {
+      quote: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      name: 'Lorem Client',
+      role: 'Lorem Role',
+    },
+    {
+      quote: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      name: 'Ipsum Partner',
+      role: 'Ipsum Title',
+    },
+  ],
+  social: {
+    instagram: '',
+    linkedin: '',
+    x: '',
+    youtube: '',
+    tiktok: '',
+    website: '',
+  },
+  apiConnections: {
+    aiProvider: 'OpenAI',
+    aiModel: 'gpt-4o-mini',
+    customEndpoint: '',
+  },
+  contactEmail: 'lorem@ipsum.com',
+  contactPhone: '+1 555 0199',
+  updatedAt: now,
+})
+
 export const SEED_PORTFOLIOS: PortfolioData[] = [
   makeProfile(
     'aria-velvet',
@@ -147,6 +225,27 @@ export const SEED_PORTFOLIOS: PortfolioData[] = [
     'Creative Agency',
     'Minimal systems for identity, web, and growth campaigns.',
     'Mono Creative designs brand systems and conversion experiences for creators, teams, and ambitious companies.',
+  ),
+  makeLoremProfile(
+    'velvet-noir-demo',
+    'velvet-noir',
+    'Velvet Noir Demo',
+    'Actor',
+    'Lorem Ipsum Director',
+  ),
+  makeLoremProfile(
+    'pastel-signature-demo',
+    'pastel-signature',
+    'Pastel Signature Demo',
+    'Influencer',
+    'Lorem Ipsum Designer',
+  ),
+  makeLoremProfile(
+    'agatho-atelier-demo',
+    'agatho-atelier',
+    'Agatho Atelier Demo',
+    'Agency',
+    'Lorem Ipsum Studio',
   ),
 ]
 

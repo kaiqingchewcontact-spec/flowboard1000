@@ -38,13 +38,25 @@ interface OnboardingInput {
   notes: string
 }
 
-const parseApiError = async (response: Response) => {
+const parseJsonSafely = <T>(text: string): T | null => {
   try {
-    const payload = (await response.json()) as ApiErrorPayload
-    return payload.error || `Request failed (${response.status}).`
+    return JSON.parse(text) as T
   } catch {
-    return `Request failed (${response.status}).`
+    return null
   }
+}
+
+const parseApiError = (response: Response, bodyText: string, contentType: string) => {
+  if (contentType.includes('application/json')) {
+    const payload = parseJsonSafely<ApiErrorPayload>(bodyText)
+    return payload?.error || `Request failed (${response.status}).`
+  }
+
+  const bodyHint =
+    bodyText.trim().startsWith('<!doctype') || bodyText.trim().startsWith('<html')
+      ? 'The server returned HTML instead of JSON.'
+      : `Unexpected response: ${bodyText.slice(0, 120)}`
+  return `Request failed (${response.status}). ${bodyHint} If you are running locally, start API + web together with "npm run dev:full".`
 }
 
 const fetchApi = async <T>(url: string, options?: RequestInit): Promise<T> => {
@@ -56,12 +68,28 @@ const fetchApi = async <T>(url: string, options?: RequestInit): Promise<T> => {
       ...(options?.headers ?? {}),
     },
   })
+  const contentType = response.headers.get('content-type')?.toLowerCase() ?? ''
+  const bodyText = await response.text()
 
   if (!response.ok) {
-    throw new Error(await parseApiError(response))
+    throw new Error(parseApiError(response, bodyText, contentType))
   }
 
-  return (await response.json()) as T
+  if (!contentType.includes('application/json')) {
+    const bodyHint =
+      bodyText.trim().startsWith('<!doctype') || bodyText.trim().startsWith('<html')
+        ? 'Received an HTML document.'
+        : `Unexpected response: ${bodyText.slice(0, 120)}`
+    throw new Error(
+      `${bodyHint} Flowboard API expected JSON. If local, run "npm run dev:full" so the backend is available.`,
+    )
+  }
+
+  const payload = parseJsonSafely<T>(bodyText)
+  if (!payload) {
+    throw new Error('Failed to parse API JSON response.')
+  }
+  return payload
 }
 
 export const getOAuthConnections = () => fetchApi<ConnectionsResponse>('/api/oauth/connections')
