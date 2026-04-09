@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { SEED_PORTFOLIOS } from '../data/seedPortfolios'
-import { getTemplateById } from '../data/templates'
+import { getTemplateById, PORTFOLIO_TEMPLATES } from '../data/templates'
 
 const featureSteps = [
   {
@@ -83,7 +83,8 @@ const pricingTeaser = [
 ]
 
 export function HomePage() {
-  const highlightedTemplates = SEED_PORTFOLIOS.slice(0, 6)
+  const highlightedTemplates = SEED_PORTFOLIOS
+  const templateCount = PORTFOLIO_TEMPLATES.length
 
   return (
     <main className="home">
@@ -126,7 +127,7 @@ export function HomePage() {
             </div>
             <div className="home__hero-metrics">
               <article>
-                <strong>8</strong>
+                <strong>{templateCount}</strong>
                 <span>Template architectures</span>
               </article>
               <article>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { PORTFOLIO_TEMPLATES } from '../data/templates'
 
 const TIERS = [
   {
@@ -7,7 +8,7 @@ const TIERS = [
     idealFor: 'Solo creators launching their first portfolio board',
     features: [
       '1 published Flowboard page',
-      '8 template library access',
+      `${PORTFOLIO_TEMPLATES.length} template library access`,
       'Slug + QR publishing',
       'Basic analytics snapshots',
     ],
