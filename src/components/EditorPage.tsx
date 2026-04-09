@@ -50,6 +50,13 @@ const emptyTestimonial = {
   role: '',
 }
 
+const reorderByIndex = <T,>(items: T[], fromIndex: number, toIndex: number): T[] => {
+  const next = [...items]
+  const [moved] = next.splice(fromIndex, 1)
+  next.splice(toIndex, 0, moved)
+  return next
+}
+
 export function EditorPage() {
   const [searchParams] = useSearchParams()
   const selectedSlug = searchParams.get('slug')
@@ -71,6 +78,10 @@ export function EditorPage() {
     x: false,
   })
   const [qrDataUrl, setQrDataUrl] = useState('')
+  const [dragPortfolioIndex, setDragPortfolioIndex] = useState<number | null>(null)
+  const [dragTestimonialIndex, setDragTestimonialIndex] = useState<number | null>(null)
+  const [portfolioDropIndex, setPortfolioDropIndex] = useState<number | null>(null)
+  const [testimonialDropIndex, setTestimonialDropIndex] = useState<number | null>(null)
 
   useEffect(() => {
     if (!selectedSlug) return
@@ -140,6 +151,22 @@ export function EditorPage() {
 
   const updateProfile = (updates: Partial<PortfolioData>) =>
     setProfile((current) => ({ ...current, ...updates }))
+
+  const movePortfolioItem = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+    updateProfile({
+      portfolioItems: reorderByIndex(profile.portfolioItems, fromIndex, toIndex),
+    })
+    setStatus(`Reordered portfolio items (${fromIndex + 1} -> ${toIndex + 1}).`)
+  }
+
+  const moveTestimonial = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+    updateProfile({
+      testimonials: reorderByIndex(profile.testimonials, fromIndex, toIndex),
+    })
+    setStatus(`Reordered testimonials (${fromIndex + 1} -> ${toIndex + 1}).`)
+  }
 
   const publishProfile = () => {
     if (isSlugTaken) {
@@ -353,8 +380,41 @@ export function EditorPage() {
         {activePanel === 'portfolio' && (
           <section className="studio__panel">
             <h2>Portfolio Items</h2>
+            <p className="studio__hint">Drag and drop each box to reorder portfolio cards.</p>
             {profile.portfolioItems.map((item, index) => (
-              <div key={`${item.title}-${index}`} className="studio__group">
+              <div
+                key={`${item.title}-${index}`}
+                className={`studio__group studio__group--draggable${portfolioDropIndex === index ? ' is-drop-target' : ''}`}
+                draggable
+                onDragStart={(event) => {
+                  setDragPortfolioIndex(index)
+                  event.dataTransfer.effectAllowed = 'move'
+                  event.dataTransfer.setData('text/plain', String(index))
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault()
+                  event.dataTransfer.dropEffect = 'move'
+                  setPortfolioDropIndex(index)
+                }}
+                onDragLeave={() => {
+                  setPortfolioDropIndex((current) => (current === index ? null : current))
+                }}
+                onDrop={(event) => {
+                  event.preventDefault()
+                  const fallback = Number(event.dataTransfer.getData('text/plain'))
+                  const fromIndex = dragPortfolioIndex ?? (Number.isNaN(fallback) ? null : fallback)
+                  if (fromIndex !== null && fromIndex >= 0 && fromIndex < profile.portfolioItems.length) {
+                    movePortfolioItem(fromIndex, index)
+                  }
+                  setDragPortfolioIndex(null)
+                  setPortfolioDropIndex(null)
+                }}
+                onDragEnd={() => {
+                  setDragPortfolioIndex(null)
+                  setPortfolioDropIndex(null)
+                }}
+              >
+                <p className="studio__drag-hint">⋮⋮ Drag to reorder</p>
                 <h3>Item {index + 1}</h3>
                 <label>
                   Title
@@ -414,8 +474,41 @@ export function EditorPage() {
         {activePanel === 'testimonials' && (
           <section className="studio__panel">
             <h2>Testimonials</h2>
+            <p className="studio__hint">Drag and drop each box to reorder testimonial cards.</p>
             {profile.testimonials.map((testimonial, index) => (
-              <div key={`${testimonial.name}-${index}`} className="studio__group">
+              <div
+                key={`${testimonial.name}-${index}`}
+                className={`studio__group studio__group--draggable${testimonialDropIndex === index ? ' is-drop-target' : ''}`}
+                draggable
+                onDragStart={(event) => {
+                  setDragTestimonialIndex(index)
+                  event.dataTransfer.effectAllowed = 'move'
+                  event.dataTransfer.setData('text/plain', String(index))
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault()
+                  event.dataTransfer.dropEffect = 'move'
+                  setTestimonialDropIndex(index)
+                }}
+                onDragLeave={() => {
+                  setTestimonialDropIndex((current) => (current === index ? null : current))
+                }}
+                onDrop={(event) => {
+                  event.preventDefault()
+                  const fallback = Number(event.dataTransfer.getData('text/plain'))
+                  const fromIndex = dragTestimonialIndex ?? (Number.isNaN(fallback) ? null : fallback)
+                  if (fromIndex !== null && fromIndex >= 0 && fromIndex < profile.testimonials.length) {
+                    moveTestimonial(fromIndex, index)
+                  }
+                  setDragTestimonialIndex(null)
+                  setTestimonialDropIndex(null)
+                }}
+                onDragEnd={() => {
+                  setDragTestimonialIndex(null)
+                  setTestimonialDropIndex(null)
+                }}
+              >
+                <p className="studio__drag-hint">⋮⋮ Drag to reorder</p>
                 <h3>Testimonial {index + 1}</h3>
                 <label>
                   Quote

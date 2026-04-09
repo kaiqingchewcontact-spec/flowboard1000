@@ -761,6 +761,64 @@ a {
   color: #64748b;
 }
 
+.home__testimonial--active {
+  animation: none;
+  background: #fff;
+  border-color: #d8def3;
+  box-shadow: 0 16px 34px -28px rgba(79, 70, 229, 0.44);
+}
+
+.home__testimonial-controls {
+  margin-top: 0.65rem;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.home__testimonial-controls button {
+  border: 1px solid #dbe2ea;
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home__faq {
+  background: #fff;
+  border: 1px solid #dbe2ea;
+  border-radius: 0.95rem;
+  padding: 1rem;
+}
+
+.home__faq h2 {
+  margin-top: 0;
+}
+
+.home__faq-grid {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.75rem;
+}
+
+.home__faq-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  padding: 0.75rem;
+}
+
+.home__faq-item h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.home__faq-item p {
+  margin: 0.45rem 0 0;
+  color: #475569;
+}
+
 .home__insights {
   background: #fff;
   border: 1px solid #dbe2ea;
@@ -827,8 +885,47 @@ a {
 .pricing-grid {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
+}
+
+.pricing__billing-toggle {
+  margin-top: 1rem;
+  border: 1px solid #dbe2ea;
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pricing__billing-toggle p {
+  margin: 0;
+  font-weight: 700;
+  color: #334155;
+}
+
+.pricing__billing-toggle div {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.pricing__billing-toggle button {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pricing__billing-toggle button.is-active {
+  background: linear-gradient(120deg, #4f46e5, #ec4899);
+  border-color: transparent;
+  color: #fff;
 }
 
 .pricing-card {
@@ -858,6 +955,13 @@ a {
   color: #475569;
 }
 
+.pricing-card__caption {
+  margin: 0.5rem 0 0.7rem;
+  font-size: 0.8rem;
+  color: #0369a1;
+  font-weight: 700;
+}
+
 .pricing-card ul {
   margin: 0;
   padding-left: 1.15rem;
@@ -873,6 +977,56 @@ a {
   color: #fff;
   border-radius: 0.6rem;
   padding: 0.5rem 0.8rem;
+}
+
+.pricing__comparison {
+  margin-top: 1rem;
+  border: 1px solid #dbe2ea;
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 1rem;
+}
+
+.pricing__comparison h2 {
+  margin: 0;
+}
+
+.pricing__comparison-table-wrap {
+  margin-top: 0.75rem;
+  overflow-x: auto;
+}
+
+.pricing__comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.pricing__comparison th,
+.pricing__comparison td {
+  border: 1px solid #e2e8f0;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.88rem;
+}
+
+.pricing__comparison th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.pricing__notes {
+  margin-top: 0.9rem;
+  border: 1px solid #dbe2ea;
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.85rem;
+}
+
+.pricing__notes p {
+  margin: 0.2rem 0;
+  color: #475569;
 }
 
 .onboarding {
@@ -1072,6 +1226,29 @@ a {
   border-radius: 0.75rem;
   padding: 0.75rem;
   background: #f8fafc;
+}
+
+.studio__group--draggable {
+  cursor: grab;
+}
+
+.studio__group--draggable:active {
+  cursor: grabbing;
+}
+
+.studio__group--draggable.is-drop-target {
+  border-color: #6366f1;
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.25);
+  background: #eef2ff;
+}
+
+.studio__drag-hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  font-weight: 700;
 }
 
 .studio__group h3 {
@@ -1645,13 +1822,28 @@ a {
 
   .home__value-grid,
   .home__pricing-grid,
-  .home__testimonials-track {
+  .home__faq-grid {
     grid-template-columns: 1fr;
   }
 
   .home__pricing-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .home__testimonial-controls {
+    width: 100%;
+  }
+
+  .pricing__billing-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricing__billing-toggle div {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .studio {
