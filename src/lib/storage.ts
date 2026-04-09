@@ -6,11 +6,8 @@ const STORAGE_KEY = 'flowboard-profiles-v2'
 const LEGACY_STORAGE_KEY = 'portfolio-studio-profiles-v1'
 
 const DEFAULT_API_CONNECTIONS: PortfolioData['apiConnections'] = {
-  instagramToken: '',
-  linkedinToken: '',
-  xToken: '',
   aiProvider: 'OpenAI',
-  aiModel: 'gpt-4.1-mini',
+  aiModel: 'gpt-4o-mini',
   customEndpoint: '',
 }
 
@@ -31,7 +28,10 @@ const sanitizeProfile = (profile: PortfolioData): PortfolioData => {
     ...profile,
     slug: normalizeSlug(profile.slug) || 'my-portfolio',
     templateId,
-    apiConnections: profile.apiConnections ?? DEFAULT_API_CONNECTIONS,
+    apiConnections: {
+      ...DEFAULT_API_CONNECTIONS,
+      ...(profile.apiConnections ?? {}),
+    },
     updatedAt: profile.updatedAt || new Date().toISOString(),
   }
 }

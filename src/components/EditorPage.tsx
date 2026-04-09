@@ -3,6 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { DEFAULT_EDITOR_PROFILE } from '../data/seedPortfolios'
 import { PORTFOLIO_TEMPLATES } from '../data/templates'
+import {
+  disconnectOAuthProvider,
+  getOAuthConnections,
+  startOAuthConnect,
+  type OAuthProvider,
+} from '../lib/backendApi'
 import { autoDesignLandingPage, pullSocialDataWithAI } from '../lib/socialImport'
 import {
   getProfileBySlug,
@@ -53,6 +59,17 @@ export function EditorPage() {
   const [status, setStatus] = useState('Flowboard ready. Start shaping your portfolio board.')
   const [busyPlatform, setBusyPlatform] = useState<'instagram' | 'linkedin' | 'x' | ''>('')
   const [isAutoDesigning, setIsAutoDesigning] = useState(false)
+  const [oauthLoading, setOauthLoading] = useState(false)
+  const [oauthConnections, setOauthConnections] = useState<Record<OAuthProvider, boolean>>({
+    instagram: false,
+    linkedin: false,
+    x: false,
+  })
+  const [oauthConfigured, setOauthConfigured] = useState<Record<OAuthProvider, boolean>>({
+    instagram: false,
+    linkedin: false,
+    x: false,
+  })
   const [qrDataUrl, setQrDataUrl] = useState('')
 
   useEffect(() => {
@@ -63,6 +80,48 @@ export function EditorPage() {
       setStatus(`Loaded ${existing.displayName} into the editor.`)
     }
   }, [selectedSlug])
+
+  const refreshOAuthStatus = async () => {
+    setOauthLoading(true)
+    try {
+      const data = await getOAuthConnections()
+      setOauthConnections(data.connections)
+      setOauthConfigured(data.configured)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to load OAuth status.')
+    } finally {
+      setOauthLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void refreshOAuthStatus()
+  }, [])
+
+  useEffect(() => {
+    const oauthResult = searchParams.get('oauth')
+    const provider = searchParams.get('provider')
+    const message = searchParams.get('message')
+    const onboarding = searchParams.get('onboarding')
+
+    if (onboarding === 'success') {
+      setStatus('Onboarding completed. Continue connecting socials and generating your board.')
+      setActivePanel('api')
+    }
+
+    if (!oauthResult || !provider) return
+
+    if (oauthResult === 'success') {
+      setStatus(`${provider === 'x' ? 'X' : provider} connected successfully.`)
+      setActivePanel('api')
+      void refreshOAuthStatus()
+      return
+    }
+
+    const fallback = `${provider === 'x' ? 'X' : provider} connection failed.`
+    setStatus(message || fallback)
+    setActivePanel('api')
+  }, [searchParams])
 
   const normalizedSlug = useMemo(() => normalizePortfolioSlug(profile.slug) || 'my-portfolio', [profile.slug])
   const publicUrl = useMemo(
@@ -99,6 +158,12 @@ export function EditorPage() {
   }
 
   const runSocialImport = async (platform: 'instagram' | 'linkedin' | 'x') => {
+    if (!oauthConnections[platform]) {
+      setStatus(`${platform === 'x' ? 'X' : platform} is not connected. Connect it in API Connect first.`)
+      setActivePanel('api')
+      return
+    }
+
     const value = profile.social[platform]
     setBusyPlatform(platform)
     setStatus(`AI is importing from ${platform === 'x' ? 'X' : platform}...`)
@@ -119,6 +184,12 @@ export function EditorPage() {
   }
 
   const runAutoDesign = async () => {
+    if (!oauthConnections.instagram && !oauthConnections.linkedin && !oauthConnections.x) {
+      setStatus('Connect at least one social account in API Connect before running auto-design.')
+      setActivePanel('api')
+      return
+    }
+
     setIsAutoDesigning(true)
     setStatus('Flowboard AI is building your landing page style from connected social data...')
 
@@ -131,6 +202,29 @@ export function EditorPage() {
       setStatus(error instanceof Error ? error.message : 'Unable to run AI auto-design.')
     } finally {
       setIsAutoDesigning(false)
+    }
+  }
+
+  const connectProvider = (provider: OAuthProvider) => {
+    if (!oauthConfigured[provider]) {
+      setStatus(
+        `${provider === 'x' ? 'X' : provider} OAuth is not configured on the server yet. Set env vars first.`,
+      )
+      return
+    }
+    startOAuthConnect(provider)
+  }
+
+  const disconnectProvider = async (provider: OAuthProvider) => {
+    setOauthLoading(true)
+    try {
+      const response = await disconnectOAuthProvider(provider)
+      setOauthConnections(response.connections)
+      setStatus(`${provider === 'x' ? 'X' : provider} disconnected.`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to disconnect provider.')
+    } finally {
+      setOauthLoading(false)
     }
   }
 
@@ -388,53 +482,42 @@ export function EditorPage() {
           <section className="studio__panel">
             <h2>Flowboard API Connect</h2>
             <p>
-              Connect social/API credentials so AI can pull profile context and automate your landing page design.
+              Connect your social accounts through OAuth so Flowboard can securely store tokens server-side and pull
+              live profile signals.
             </p>
-            <label>
-              Instagram API Token
-              <input
-                value={profile.apiConnections.instagramToken}
-                onChange={(event) =>
-                  updateProfile({
-                    apiConnections: {
-                      ...profile.apiConnections,
-                      instagramToken: event.target.value,
-                    },
-                  })
-                }
-                placeholder="ig-token-..."
-              />
-            </label>
-            <label>
-              LinkedIn API Token
-              <input
-                value={profile.apiConnections.linkedinToken}
-                onChange={(event) =>
-                  updateProfile({
-                    apiConnections: {
-                      ...profile.apiConnections,
-                      linkedinToken: event.target.value,
-                    },
-                  })
-                }
-                placeholder="linkedin-token-..."
-              />
-            </label>
-            <label>
-              X API Token
-              <input
-                value={profile.apiConnections.xToken}
-                onChange={(event) =>
-                  updateProfile({
-                    apiConnections: {
-                      ...profile.apiConnections,
-                      xToken: event.target.value,
-                    },
-                  })
-                }
-                placeholder="x-token-..."
-              />
-            </label>
+            <button type="button" disabled={oauthLoading} onClick={() => void refreshOAuthStatus()}>
+              {oauthLoading ? 'Refreshing…' : 'Refresh connection status'}
+            </button>
+            <div className="studio__oauth-list">
+              {(['instagram', 'linkedin', 'x'] as const).map((provider) => (
+                <div key={provider} className="studio__oauth-item">
+                  <div>
+                    <p className="studio__oauth-title">{provider === 'x' ? 'X' : provider}</p>
+                    <p className={`studio__oauth-badge ${oauthConnections[provider] ? 'is-connected' : 'is-disconnected'}`}>
+                      {oauthConnections[provider] ? 'Connected' : 'Not connected'}
+                    </p>
+                  </div>
+                  <div className="studio__oauth-actions">
+                    <button
+                      type="button"
+                      disabled={oauthLoading || !oauthConfigured[provider]}
+                      onClick={() => connectProvider(provider)}
+                    >
+                      {oauthConfigured[provider] ? 'Connect OAuth' : 'Not configured'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={oauthLoading || !oauthConnections[provider]}
+                      onClick={() => {
+                        void disconnectProvider(provider)
+                      }}
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
             <label>
               AI Provider
               <select
@@ -486,7 +569,8 @@ export function EditorPage() {
               </label>
             )}
             <p className="studio__hint">
-              Demo note: these credentials stay in local browser storage in this prototype.
+              OAuth tokens are stored in the server-side encrypted vault. AI provider keys are read from server env
+              variables.
             </p>
           </section>
         )}
@@ -494,7 +578,7 @@ export function EditorPage() {
         {activePanel === 'social' && (
           <section className="studio__panel">
             <h2>Social Connect + AI Populate</h2>
-            <p>Paste profile URLs or usernames and click connect to auto-populate your portfolio fields.</p>
+            <p>Paste profile URLs or usernames and run live social pull to auto-populate your portfolio fields.</p>
             {(['instagram', 'linkedin', 'x'] as const).map((platform) => (
               <div key={platform} className="studio__social-row">
                 <label>
@@ -516,7 +600,9 @@ export function EditorPage() {
                     void runSocialImport(platform)
                   }}
                 >
-                  {busyPlatform === platform ? 'Importing...' : `Connect + AI Pull from ${platform === 'x' ? 'X' : platform}`}
+                  {busyPlatform === platform
+                    ? 'Importing...'
+                    : `Pull live data + AI from ${platform === 'x' ? 'X' : platform}`}
                 </button>
               </div>
             ))}
@@ -611,6 +697,8 @@ export function EditorPage() {
           <Link to={`/p/${normalizedSlug}`} target="_blank">
             Open Public Page
           </Link>
+          <Link to="/pricing">Pricing</Link>
+          <Link to="/onboarding">Onboarding</Link>
         </footer>
       </section>
 

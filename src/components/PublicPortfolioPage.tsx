@@ -16,6 +16,7 @@ export function PublicPortfolioPage() {
         </p>
         <div className="missing__actions">
           <Link to="/">See Flowboard gallery</Link>
+          <Link to="/onboarding">Start onboarding</Link>
           <Link to="/editor">Create this page in Flowboard</Link>
         </div>
       </main>
@@ -26,6 +27,8 @@ export function PublicPortfolioPage() {
     <main className="public-page">
       <div className="public-page__actions">
         <Link to="/">Flowboard Gallery</Link>
+        <Link to="/pricing">Pricing</Link>
+        <Link to="/onboarding">Onboarding</Link>
         <Link to={`/editor?slug=${profile.slug}`}>Edit this page</Link>
       </div>
       <PortfolioRenderer profile={profile} shareUrl={url} />

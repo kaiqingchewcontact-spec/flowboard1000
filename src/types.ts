@@ -31,9 +31,6 @@ export interface SocialLinks {
 }
 
 export interface ApiConnections {
-  instagramToken: string
-  linkedinToken: string
-  xToken: string
   aiProvider: 'OpenAI' | 'Anthropic' | 'Custom'
   aiModel: string
   customEndpoint: string

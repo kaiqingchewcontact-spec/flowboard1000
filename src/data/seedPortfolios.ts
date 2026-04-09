@@ -66,11 +66,8 @@ const makeProfile = (
     website: '',
   },
   apiConnections: {
-    instagramToken: '',
-    linkedinToken: '',
-    xToken: '',
     aiProvider: 'OpenAI',
-    aiModel: 'gpt-4.1-mini',
+    aiModel: 'gpt-4o-mini',
     customEndpoint: '',
   },
   contactEmail: 'hello@example.com',
