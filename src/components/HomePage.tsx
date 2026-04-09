@@ -4,23 +4,46 @@ import { getTemplateById } from '../data/templates'
 
 const featureSteps = [
   {
-    title: 'Start with a trend-driven template',
+    title: 'Connect your channels',
     description:
-      'Choose from 8 editorial template styles with distinct fonts, color systems, motion, and graphics.',
+      'Use OAuth to connect Instagram, LinkedIn, and X so Flowboard can ingest real profile context.',
   },
   {
-    title: 'Connect social OAuth + AI',
+    title: 'Generate a compelling board',
     description:
-      'Connect Instagram, LinkedIn, and X. Flowboard pulls live profile context and drafts compelling landing copy.',
+      'Apply template architecture + AI to shape sharper messaging, structure, and conversion blocks.',
   },
   {
-    title: 'Publish and share instantly',
+    title: 'Publish in one click',
     description:
-      'Pick your custom slug, publish your board, and download a QR card for social bios and name cards.',
+      'Launch to your custom slug and share through social links, QR cards, and campaign touchpoints.',
   },
 ]
 
 const trustSignals = ['Creative founders', 'Talent managers', 'Personal brands', 'Studios', 'Agencies']
+
+const logoWall = ['Aster', 'Northbeam', 'Verve', 'Motif', 'Radius', 'Luma', 'Vertex']
+
+const testimonials = [
+  {
+    quote:
+      'Flowboard cut our launch time from days to hours. The AI copy and template architecture felt agency-grade out of the box.',
+    name: 'Lena Moore',
+    role: 'Talent Manager, Northbeam',
+  },
+  {
+    quote:
+      'We connected socials, selected a style, and published a polished board before our campaign call. Super practical product.',
+    name: 'Kaito Reed',
+    role: 'Creative Lead, Luma Studio',
+  },
+  {
+    quote:
+      'The slug + QR workflow is exactly what our team needed for events, press kits, and social bios.',
+    name: 'Maya Carter',
+    role: 'Marketing Director, Aster House',
+  },
+]
 
 const valueCards = [
   {
@@ -31,7 +54,7 @@ const valueCards = [
   {
     title: 'Real social + AI workflow',
     description:
-      'OAuth connections feed real profile context into OpenAI or Anthropic to generate sharper story, highlights, and CTA copy.',
+      'OAuth connections feed profile context into OpenAI or Anthropic to generate sharper story, highlights, and CTA copy.',
   },
   {
     title: 'Launch-ready publishing',
@@ -40,34 +63,66 @@ const valueCards = [
   },
 ]
 
+const pricingTeaser = [
+  {
+    name: 'Starter',
+    price: '$29/mo',
+    detail: 'For creators launching one polished board quickly.',
+  },
+  {
+    name: 'Pro',
+    price: '$89/mo',
+    detail: 'For teams needing multi-board workflows and AI automation.',
+    featured: true,
+  },
+  {
+    name: 'Studio',
+    price: 'Custom',
+    detail: 'For agencies and enterprise brands with managed onboarding.',
+  },
+]
+
 export function HomePage() {
   const highlightedTemplates = SEED_PORTFOLIOS.slice(0, 6)
 
   return (
     <main className="home">
-      <header className="home__hero">
-        <nav className="home__top-nav">
-          <Link to="/">Flowboard</Link>
-          <div>
-            <Link to="/onboarding">Onboarding</Link>
+      <div className="home__sticky-nav-wrap">
+        <nav className="home__sticky-nav">
+          <Link className="home__brand-mark" to="/">
+            Flowboard
+          </Link>
+          <div className="home__sticky-nav-links">
+            <a href="#flowboard-overview">Overview</a>
+            <a href="#flowboard-templates">Templates</a>
+            <a href="#flowboard-pricing">Pricing</a>
+            <a href="#flowboard-testimonials">Testimonials</a>
+          </div>
+          <div className="home__sticky-nav-actions">
             <Link to="/pricing">Pricing</Link>
             <Link to="/editor">Editor</Link>
+            <Link className="is-primary" to="/onboarding">
+              Start free
+            </Link>
           </div>
         </nav>
+      </div>
+
+      <header id="flowboard-overview" className="home__hero">
         <div className="home__hero-shell">
           <div className="home__hero-copy">
             <p className="home__eyebrow">Flowboard · AI Portfolio Boards</p>
-            <h1>Build a conversion-ready portfolio landing page with live social intelligence</h1>
+            <h1>Turn your portfolio into a modern SaaS-style landing page</h1>
             <p>
-              For singers, actors, public people, and brands. Flowboard combines creative template systems, social OAuth
-              integrations, and production-grade AI generation in one editorial builder.
+              For singers, actors, public people, and brands. Flowboard blends template architecture, live OAuth data,
+              and AI generation into one conversion-focused publishing workflow.
             </p>
             <div className="home__actions">
               <Link to="/onboarding" className="primary">
-                Start onboarding
+                Start free onboarding
               </Link>
-              <Link to="/editor">Open editor</Link>
-              <Link to="/pricing">See pricing</Link>
+              <Link to="/editor">Open live editor</Link>
+              <Link to="/pricing">View pricing</Link>
             </div>
             <div className="home__hero-metrics">
               <article>
@@ -76,35 +131,57 @@ export function HomePage() {
               </article>
               <article>
                 <strong>3</strong>
-                <span>Live OAuth sources</span>
+                <span>OAuth channels</span>
               </article>
               <article>
-                <strong>2</strong>
-                <span>AI providers + custom API</span>
+                <strong>2+</strong>
+                <span>AI providers</span>
               </article>
             </div>
           </div>
 
-          <aside className="home__hero-panel" aria-label="Flowboard editor preview">
-            <p className="home__panel-label">Live Campaign View</p>
-            <h2>AI-Powered Portfolio Launch</h2>
+          <aside className="home__hero-panel" aria-label="Flowboard product mockup">
+            <p className="home__panel-label">Live product preview</p>
+            <h2>AI-powered conversion landing setup</h2>
             <div className="home__panel-grid">
               <article>
-                <p>Connected sources</p>
+                <p>Connected channels</p>
                 <strong>Instagram · LinkedIn · X</strong>
               </article>
               <article>
-                <p>Selected style</p>
+                <p>Template direction</p>
                 <strong>Bento + editorial hero</strong>
               </article>
               <article>
-                <p>Publish status</p>
+                <p>Publish state</p>
                 <strong>Ready at /p/your-slug</strong>
               </article>
               <article>
-                <p>Conversion assets</p>
-                <strong>Slug link + QR card</strong>
+                <p>Share assets</p>
+                <strong>Link + QR card</strong>
               </article>
+            </div>
+            <div className="home__mockup-device">
+              <div className="home__mockup-head">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="home__mockup-screen">
+                <div className="home__mockup-row">
+                  <span className="w-lg" />
+                  <span className="w-sm" />
+                </div>
+                <div className="home__mockup-row">
+                  <span className="w-md" />
+                  <span className="w-md" />
+                </div>
+                <div className="home__mockup-cards">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
             </div>
             <Link className="home__panel-cta" to="/editor">
               Generate my landing page
@@ -118,6 +195,15 @@ export function HomePage() {
         <div>
           {trustSignals.map((signal) => (
             <span key={signal}>{signal}</span>
+          ))}
+        </div>
+      </section>
+
+      <section className="home__section home__logos" aria-label="Logo wall">
+        <p>Used by teams shaping modern brand pages</p>
+        <div>
+          {logoWall.map((logo) => (
+            <span key={logo}>{logo}</span>
           ))}
         </div>
       </section>
@@ -147,7 +233,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="home__section">
+      <section id="flowboard-templates" className="home__section">
         <h2>Template gallery</h2>
         <p>Choose a starter board, then adapt every section in the editor with live AI pulls.</p>
         <div className="home__grid">
@@ -166,8 +252,7 @@ export function HomePage() {
                     <a href={template.inspiration.url} target="_blank" rel="noreferrer">
                       {template.inspiration.studio}
                     </a>{' '}
-                    · {template.architecture}{' '}
-                    grid · {template.scrollEffect} scroll
+                    · {template.architecture} grid · {template.scrollEffect} scroll
                     {template.inspiration.access === 'limited' ? ' · limited crawl access' : ''}
                   </p>
                 </div>
@@ -184,35 +269,42 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="home__section home__pricing-teaser">
+      <section id="flowboard-pricing" className="home__section home__pricing-teaser">
         <div className="home__pricing-header">
-          <h2>Tiered pricing built for every stage</h2>
-          <Link to="/pricing">Compare full pricing</Link>
+          <h2>Tiered pricing for every stage</h2>
+          <Link to="/pricing">Compare all plan details</Link>
         </div>
         <div className="home__pricing-grid">
-          <article>
-            <p>Starter</p>
-            <strong>$29/mo</strong>
-            <span>For solo creators launching one board.</span>
-          </article>
-          <article className="is-featured">
-            <p>Pro</p>
-            <strong>$89/mo</strong>
-            <span>For teams that need multi-board workflows and faster production.</span>
-          </article>
-          <article>
-            <p>Studio</p>
-            <strong>Custom</strong>
-            <span>For agencies and enterprise brand systems with managed onboarding.</span>
-          </article>
+          {pricingTeaser.map((plan) => (
+            <article key={plan.name} className={plan.featured ? 'is-featured' : ''}>
+              <p>{plan.name}</p>
+              <strong>{plan.price}</strong>
+              <span>{plan.detail}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="flowboard-testimonials" className="home__section home__testimonials">
+        <h2>What teams say about Flowboard</h2>
+        <div className="home__testimonial-track">
+          {testimonials.map((item) => (
+            <article key={item.name} className="home__testimonial-card">
+              <p>"{item.quote}"</p>
+              <footer>
+                <strong>{item.name}</strong>
+                <span>{item.role}</span>
+              </footer>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="home__section home__insights">
         <h2>Ready to launch your Flowboard?</h2>
         <p>
-          Start with onboarding, connect socials, and publish a polished landing page that is built for sharing and
-          conversion.
+          Connect socials, let AI shape your story, and publish a polished landing page designed for conversion and
+          sharing.
         </p>
         <div className="home__insights-actions">
           <Link to="/onboarding">Start onboarding</Link>
