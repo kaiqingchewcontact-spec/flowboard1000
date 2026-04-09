@@ -659,7 +659,12 @@ export function EditorPage() {
                   <strong>{template.name}</strong>
                   <span>{template.description}</span>
                   <span className="studio__template-meta">
-                    {template.trendNote} · {template.motion} motion · {template.graphics} graphics
+                    {template.trendNote} · {template.motion} motion · {template.graphics} graphics · {template.architecture}{' '}
+                    architecture · {template.scrollEffect} scroll
+                  </span>
+                  <span className="studio__template-source">
+                    Inspired by {template.inspiration.studio} ({template.inspiration.tier}
+                    {template.inspiration.access === 'limited' ? ', limited crawl access' : ''})
                   </span>
                 </button>
               ))}

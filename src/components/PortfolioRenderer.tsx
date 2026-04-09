@@ -1,5 +1,5 @@
 import { getTemplateById } from '../data/templates'
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import type { PortfolioData } from '../types'
 
 interface PortfolioRendererProps {
@@ -23,11 +23,44 @@ export function PortfolioRenderer({
   mode = 'public',
 }: PortfolioRendererProps) {
   const template = getTemplateById(profile.templateId)
+  const articleRef = useRef<HTMLElement | null>(null)
   const socialEntries = Object.entries(profile.social).filter(([, url]) => url.trim().length > 0)
+  const hasShareUrl = Boolean(shareUrl)
+
+  useEffect(() => {
+    const root = articleRef.current
+    if (!root) return
+
+    root.classList.add('portfolio--scroll-ready')
+    const sections = Array.from(root.querySelectorAll<HTMLElement>('[data-reveal="true"]'))
+    sections.forEach((section, index) => {
+      if (index < 2) {
+        section.classList.add('is-visible')
+      } else {
+        section.classList.remove('is-visible')
+      }
+    })
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.2 },
+    )
+
+    sections.slice(2).forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [template.id, mode, socialEntries.length, hasShareUrl])
 
   return (
     <article
-      className={`portfolio portfolio--${template.layout} portfolio--motion-${template.motion} portfolio--graphic-${template.graphics}`}
+      ref={articleRef}
+      className={`portfolio portfolio--${template.layout} portfolio--arch-${template.architecture} portfolio--motion-${template.motion} portfolio--graphic-${template.graphics} portfolio--scroll-${template.scrollEffect}`}
       style={
         {
           '--page-bg': template.theme.pageBg,
@@ -41,6 +74,11 @@ export function PortfolioRenderer({
       }
     >
       <header className="portfolio__hero">
+        <div
+          className="portfolio__hero-inspiration-bg"
+          style={{ backgroundImage: `url(${template.heroBackgroundImage})` }}
+          aria-hidden="true"
+        />
         <img className="portfolio__hero-image" src={profile.heroImageUrl} alt={`${profile.displayName} banner`} />
         <div className="portfolio__hero-overlay" />
         <div className="portfolio__hero-graphics" aria-hidden="true">
@@ -55,16 +93,23 @@ export function PortfolioRenderer({
             <p className="portfolio__role">{profile.role}</p>
             <p className="portfolio__tagline">{profile.tagline}</p>
             <p className="portfolio__trend">{template.trendNote}</p>
+            <p className="portfolio__inspiration">
+              Inspired by{' '}
+              <a href={template.inspiration.url} target="_blank" rel="noreferrer">
+                {template.inspiration.studio}
+              </a>{' '}
+              ({template.inspiration.tier}, {template.inspiration.access === 'live' ? 'live-researched' : 'limited-access'}).
+            </p>
           </div>
         </div>
       </header>
 
-      <section className="portfolio__section">
+      <section className="portfolio__section" data-reveal="true" data-section="about">
         <h2>About</h2>
         <p>{profile.bio}</p>
       </section>
 
-      <section className="portfolio__section">
+      <section className="portfolio__section" data-reveal="true" data-section="highlights">
         <h2>Highlights</h2>
         <ul className="portfolio__list">
           {profile.highlights.map((highlight) => (
@@ -73,7 +118,7 @@ export function PortfolioRenderer({
         </ul>
       </section>
 
-      <section className="portfolio__section">
+      <section className="portfolio__section" data-reveal="true" data-section="services">
         <h2>Services & Collaborations</h2>
         <div className="portfolio__pill-list">
           {profile.services.map((service) => (
@@ -84,7 +129,7 @@ export function PortfolioRenderer({
         </div>
       </section>
 
-      <section className="portfolio__section">
+      <section className="portfolio__section" data-reveal="true" data-section="portfolio">
         <h2>Portfolio</h2>
         <div className="portfolio__grid">
           {profile.portfolioItems.map((item) => (
@@ -97,7 +142,7 @@ export function PortfolioRenderer({
         </div>
       </section>
 
-      <section className="portfolio__section">
+      <section className="portfolio__section" data-reveal="true" data-section="testimonials">
         <h2>Testimonials</h2>
         <div className="portfolio__testimonials">
           {profile.testimonials.map((testimonial) => (
@@ -111,7 +156,7 @@ export function PortfolioRenderer({
         </div>
       </section>
 
-      <section className="portfolio__section portfolio__contact">
+      <section className="portfolio__section portfolio__contact" data-reveal="true" data-section="contact">
         <h2>Contact</h2>
         <p>Email: {profile.contactEmail}</p>
         <p>Phone: {profile.contactPhone}</p>
@@ -119,7 +164,7 @@ export function PortfolioRenderer({
       </section>
 
       {socialEntries.length > 0 && (
-        <section className="portfolio__section">
+        <section className="portfolio__section" data-reveal="true" data-section="social">
           <h2>Social</h2>
           <div className="portfolio__socials">
             {socialEntries.map(([key, value]) => (
@@ -132,7 +177,7 @@ export function PortfolioRenderer({
       )}
 
       {shareUrl && (
-        <section className="portfolio__section portfolio__share">
+        <section className="portfolio__section portfolio__share" data-reveal="true" data-section="share">
           <h2>Share</h2>
           <p>
             Public slug: <strong>/{profile.slug}</strong>

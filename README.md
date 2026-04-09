@@ -50,6 +50,27 @@ Frontend runs on `http://localhost:5173`, API on `http://localhost:8787` (proxie
 - `/p/:slug` public portfolio
 - `/:slug` public portfolio alias
 
+## Template design architecture study references
+
+Flowboard template architecture is adapted from the creative references you provided:
+
+1. https://www.raviklaassens.com/ (Free)
+2. https://mats.zip/ (Free, limited public crawl signal)
+3. https://kawe.ski/ (Paid)
+4. https://daveholloway.uk/ (Paid, anti-bot protected during crawl)
+5. https://fluid.glass/ (Paid)
+6. https://jungheonlee.com/ (Paid)
+7. https://koto.com/ (Paid)
+8. https://designbybrandin.com/ (Paid)
+
+Adapted dimensions now encoded in template data + renderer:
+- editorial font systems
+- architecture style (`editorial`, `bento`, `timeline`, `showcase`)
+- theme palette + accent direction
+- hero/background image treatment
+- scroll animation pattern (`fade-up`, `stagger`, `parallax`)
+- graphics + motion presets
+
 ## OAuth + live social pull flow
 
 1. In editor, open **API Connect** panel.

@@ -74,10 +74,19 @@ export interface PortfolioTemplate {
   name: string
   description: string
   trendNote: string
+  inspiration: {
+    studio: string
+    url: string
+    tier: 'Free' | 'Paid'
+    access: 'live' | 'limited'
+  }
   category: TemplateCategory
   layout: 'spotlight' | 'split' | 'story' | 'grid'
+  architecture: 'editorial' | 'bento' | 'timeline' | 'showcase'
   motion: 'float' | 'pulse' | 'pan'
   graphics: 'mesh' | 'rings' | 'grain' | 'minimal'
+  scrollEffect: 'fade-up' | 'stagger' | 'parallax'
+  heroBackgroundImage: string
   theme: TemplateTheme
 }
 

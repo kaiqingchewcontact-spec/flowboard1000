@@ -73,6 +73,15 @@ export function HomePage() {
                   <h3>{portfolio.displayName}</h3>
                   <p>{portfolio.tagline}</p>
                   <p className="home__trend">{template.trendNote}</p>
+                  <p className="home__inspiration">
+                    Ref:{' '}
+                    <a href={template.inspiration.url} target="_blank" rel="noreferrer">
+                      {template.inspiration.studio}
+                    </a>{' '}
+                    · {template.architecture}{' '}
+                    grid · {template.scrollEffect} scroll
+                    {template.inspiration.access === 'limited' ? ' · limited crawl access' : ''}
+                  </p>
                 </div>
                 <div className="home__card-actions">
                   <Link to={`/p/${portfolio.slug}`}>View page</Link>
